@@ -27,7 +27,7 @@ class RequestActor(staticmappingClient: ServiceClient) extends Actor with SLF4JL
       //sender() ! "Codelist Saved test"
     Await.result(staticmappingClient.request(request), TIMEOUT) match {
       case response: StaticMappingResponse =>
-        log.info(s"No. of types")
+        log.info(s"Returning Codelist save response")
         sender() ! "Codelist Saved"
     }
 
