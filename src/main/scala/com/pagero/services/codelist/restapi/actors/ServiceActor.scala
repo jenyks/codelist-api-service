@@ -11,10 +11,11 @@ import akka.util.Timeout
 import com.google.protobuf2.ByteString
 import com.pagero.servicecomm.ServiceClient
 import com.pagero.servicecomm.context.MessageContext
-import com.pagero.services.codelist.model.{CodelistInfo, StaticMappingRequest}
+import com.pagero.services.codelist.model.{CodeList, CodeListViewRequest, CodeLists, CodelistInfo, JsonSupport, StaticMappingRequest}
 import com.pagero.services.codelist.restapi.converters.StaticmappingResponseConverter
 import com.pagero.services.staticmapping.spec.CodelistSaveRequest
 
+import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
@@ -23,7 +24,7 @@ object ServiceActor {
     Props(classOf[ServiceActor], staticmappingClient)
 }
 
-trait ServiceActor extends StaticmappingResponseConverter {
+trait ServiceActor extends StaticmappingResponseConverter with JsonSupport {
 
   implicit val system: ActorSystem
   implicit val materializer: ActorMaterializer
@@ -31,16 +32,24 @@ trait ServiceActor extends StaticmappingResponseConverter {
 
   def route(staticmappingClient: ServiceClient)(implicit context: MessageContext): Route = {
     pathPrefix(pm = "api" / "v1") {
-      /*path(pm = "codelists") {
+      path(pm = "codelists") {
         get {
-          val requestActor = system.actorOf(RequestActor.props(staticmappingClient))
-          val request = StaticMappingRequest("bhagya")
-          onSuccess(requestActor ? request) {
-            case successfulResult: String =>
-              complete(StatusCodes.OK -> successfulResult)
+          parameters('id.as[String]){id =>
+            val requestActor = system.actorOf(RequestActor.props(staticmappingClient))
+            val request = CodeListViewRequest(id)
+            val responseList = (requestActor ? request).mapTo[CodeLists]
+            rejectEmptyResponse {
+              complete(responseList)
+            }
+
+//            onSuccess(requestActor ? request) {
+//              case successfulResult: CodeLists =>
+//                complete(StatusCodes.OK -> successfulResult)
+//            }
+
           }
         }
-      }  ~*/
+      } ~
       path(pm = "codelists") {
         post {
           entity(as[CodelistInfo]) { codelistInfo =>
@@ -56,6 +65,7 @@ trait ServiceActor extends StaticmappingResponseConverter {
           }
         }
       }
+
     }
   }
 
