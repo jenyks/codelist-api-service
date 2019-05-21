@@ -19,7 +19,6 @@ class RequestActor(staticmappingClient: ServiceClient) extends Actor with SLF4JL
   private val TIMEOUT = 40.seconds
 
   override def receive: PartialFunction[Any, Unit] = {
-
     case request: StaticMappingRequest =>
       log.info(s"Returning Name")
       sender() ! request.name
@@ -32,23 +31,23 @@ class RequestActor(staticmappingClient: ServiceClient) extends Actor with SLF4JL
     }
     case request : CodeListViewRequest =>
         sender() ! CodeLists(retriveCodeList(request.companiId))
-
-
   }
 
   def retriveCodeList (id : String) : List[CodeList] = {
-    val c1 = CodeList("1","Company 1","Company 1 Codelist 1","description 1")
-    val c2 = CodeList("1","Company 1","Company 1 Codelist 2","description 2")
-    val c3 = CodeList("2","Company 2","Company 2 Codelist 1","description 3")
-    val c4 = CodeList("2","Company 2","Company 2 Codelist 2","description 4")
-    val c5 = CodeList("2","Company 2","Company 2 Codelist 3","description 5")
-    val list1 : List[CodeList] = List(c1,c2)
-    val list2 : List[CodeList] = List(c3,c4,c5)
-    if(id == "1")
-      list1
-    else if (id=="2")
-      list2
-    else
-      List.empty
+        val c1 = CodeList("1","Company 1","Company 1 Codelist 1","description 1")
+        val c2 = CodeList("1","Company 1","Company 1 Codelist 2","description 2")
+        val c3 = CodeList("2","Company 2","Company 2 Codelist 1","description 3")
+        val c4 = CodeList("2","Company 2","Company 2 Codelist 2","description 4")
+        val c5 = CodeList("2","Company 2","Company 2 Codelist 3","description 5")
+        val list1 : List[CodeList] = List(c1,c2)
+        val list2 : List[CodeList] = List(c3,c4,c5)
+    id match {
+      case "1" => list1
+      case "2" => list2
+    }
   }
+
+
+
+
 }

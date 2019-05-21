@@ -38,6 +38,7 @@ trait ServiceActor extends StaticmappingResponseConverter with JsonSupport {
             val requestActor = system.actorOf(RequestActor.props(staticmappingClient))
             val request = CodeListViewRequest(id)
             val responseList = (requestActor ? request).mapTo[CodeLists]
+
             rejectEmptyResponse {
               complete(responseList)
             }
